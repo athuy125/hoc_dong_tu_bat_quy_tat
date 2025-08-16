@@ -145,28 +145,30 @@ if st.session_state.mode is None:
         st.rerun()
 
 elif st.session_state.mode == "suffix":
+    # Nếu hết suffix thì reset lại
     if not st.session_state.unused_suffixes:
         st.session_state.unused_suffixes = [(cat, suf) for cat, sufs in suffixes.items() for suf in sufs]
-        st.info("🔄 Hoàn thành một vòng học đuôi từ loại! Bắt đầu lại.")
+        st.info("🔄 Hoàn thành một vòng học đuôi từ loại! Bắt đầu vòng mới.")
+        st.session_state.current_suffix = None
 
+    # Nếu chưa có suffix hiện tại thì random suffix mới
     if st.session_state.current_suffix is None:
         st.session_state.current_suffix = random.choice(st.session_state.unused_suffixes)
         st.session_state.unused_suffixes.remove(st.session_state.current_suffix)
 
     category, suffix = st.session_state.current_suffix
     st.write(f"Đuôi cần đoán: **_{suffix}**")
-    user_type = st.text_input("Đây là loại từ gì?")
+    user_type = st.text_input("Đây là loại từ gì?").strip().lower()
+
+    mapping = {
+        "noun": ["noun", "danh từ"],
+        "verb": ["verb", "động từ"],
+        "adjective": ["adjective", "tính từ"],
+        "adverb": ["adverb", "trạng từ"],
+    }
 
     if st.button("Kiểm tra"):
-        if user_type.strip().lower() in [category.lower(), 
-                                         "noun" if category=="noun" else "",
-                                         "verb" if category=="verb" else "",
-                                         "adjective" if category=="adjective" else "",
-                                         "adverb" if category=="adverb" else "",
-                                         "danh từ" if category=="noun" else "",
-                                         "động từ" if category=="verb" else "",
-                                         "tính từ" if category=="adjective" else "",
-                                         "trạng từ" if category=="adverb" else ""]:
+        if user_type in [x.lower() for x in mapping[category]]:
             st.success("✅ Chính xác!")
         else:
             st.error(f"❌ Sai! Đúng là: {category}")
@@ -179,10 +181,9 @@ elif st.session_state.mode == "suffix":
         st.session_state.mode = None
         st.rerun()
 
-
 elif st.session_state.mode == "verb":
 
-    # Nếu chưa bắt đầu -> hiện bảng ôn tập
+ 
     if not st.session_state.verb_started:
         st.subheader("📋 Bảng động từ bất quy tắc để ôn tập:")
         df = pd.DataFrame(irregular_verbs)
@@ -198,11 +199,11 @@ elif st.session_state.mode == "verb":
             st.rerun()
 
     else:
-        # Nếu chưa có index thì gán bằng 0
+       
         if "verb_index" not in st.session_state:
             st.session_state.verb_index = 0
 
-        # Lấy động từ hiện tại theo thứ tự
+      
         current_verb = irregular_verbs[st.session_state.verb_index]
 
         base = current_verb["base"]
