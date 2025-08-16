@@ -167,11 +167,18 @@ elif st.session_state.mode == "suffix":
         "adverb": ["adverb", "trạng từ"],
     }
 
+    vi_mapping = {
+        "noun": "danh từ",
+        "verb": "động từ",
+        "adjective": "tính từ",
+        "adverb": "trạng từ",
+    }
+
     if st.button("Kiểm tra"):
         if user_type in [x.lower() for x in mapping[category]]:
             st.success("✅ Chính xác!")
         else:
-            st.error(f"❌ Sai! Đúng là: {category}")
+            st.error(f"❌ Sai rồi! Đúng là: {vi_mapping[category]} ({category})")
 
     if st.button("Từ tiếp theo"):
         st.session_state.current_suffix = None
@@ -180,6 +187,7 @@ elif st.session_state.mode == "suffix":
     if st.button("🔙 Quay lại menu"):
         st.session_state.mode = None
         st.rerun()
+
 
 elif st.session_state.mode == "verb":
 
